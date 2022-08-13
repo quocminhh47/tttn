@@ -37,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
 
-    @ExceptionHandler({BadRequestException.class})
+    @ExceptionHandler({BadRequestException.class, OutOfStockException.class})
     protected ResponseEntity<ErrorResponse> handleBadRequestException(RuntimeException exception) {
         ErrorResponse error = new ErrorResponse("400", exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

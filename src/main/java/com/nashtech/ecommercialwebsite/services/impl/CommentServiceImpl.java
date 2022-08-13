@@ -45,10 +45,7 @@ public class CommentServiceImpl implements CommentService {
                         String.format("Product with Id %s not found", productId))
                 );
 
-        String username = authenticationFacadeService.getCurentUsername();
-        Account account = userRepo.findById(username)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Account %s not found", username)));
-
+        Account account = authenticationFacadeService.getAccount();
         Comment comment = Comment.builder()
                 .message(commentRequest.getMessage())
                 .cmtTime(LocalDateTime.now())
@@ -90,7 +87,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Comment with ID: %s not found", commentId)));
         String userName = authenticationFacadeService.getCurentUsername();
-        String commentOwner = comment.getCustomer().getAccount().getEmail();
+        String commentOwner = authenticationFacadeService.getAccount().getEmail();
         if(!userName.equals(commentOwner)) {
             throw new UnauthorizedException("You don't have permission to do this!");
         }

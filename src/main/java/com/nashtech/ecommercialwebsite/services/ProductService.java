@@ -19,36 +19,9 @@ public interface ProductService {
                                    int pageSize,
                                    String sortBy,
                                    String sortDirection);
-//
-//    ProductResponse getAllAvailableProducts( boolean hidden ,
-//                                             int pageNo,
-//                                             int pageSize,
-//                                             String sortBy,
-//                                             String sortDirection);
-//
-//    ProductResponse getProductsByBrandName(String brandName,
-//                                           int pageNo,
-//                                           int pageSize,
-//                                           String sortBy,
-//                                           String sortDirection);
-//
+
     SingleProductResponse saveProduct(ProductRequest productRequest, Integer id);
-//
-//    SingleProductResponse updateProduct(int id , ProductUpdateRequest productRequest);
-//
-//    SingleProductResponse deleteProduct(int id);
-//
-//    ProductResponse getProductsByGender(boolean gender,
-//                                        int pageNo,
-//                                        int pageSize,
-//                                        String sortBy,
-//                                        String sortDirection);
-//
-//    ProductResponse getProductByNameOrIdContaining(String likePattern,
-//                                                   int pageNo,
-//                                                   int pageSize,
-//                                                   String sortBy,
-//                                                   String sortDirection);
+
 
 
 }
