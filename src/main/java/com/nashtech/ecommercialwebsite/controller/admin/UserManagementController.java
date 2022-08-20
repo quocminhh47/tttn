@@ -1,32 +1,58 @@
 package com.nashtech.ecommercialwebsite.controller.admin;
 
 import com.nashtech.ecommercialwebsite.dto.request.SignupDto;
+import com.nashtech.ecommercialwebsite.dto.response.ListCommentResponse;
+import com.nashtech.ecommercialwebsite.dto.response.ListCustomerResponse;
+import com.nashtech.ecommercialwebsite.dto.response.StaffResponse;
 import com.nashtech.ecommercialwebsite.services.AccountServices;
+import com.nashtech.ecommercialwebsite.services.CustomerService;
+import com.nashtech.ecommercialwebsite.utils.AppConstants;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Tag(name = "User Resources Management",
         description = "Permit to access / change customer's account status")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/admin/api/signup")
+@RequestMapping("/admin/api/")
 public class UserManagementController {
 
     private final AccountServices accountService;
+    private final CustomerService customerService;
+    private static final String ADMIN_ROLE = "ADMIN";
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public String registerCustomer(@Valid @RequestBody SignupDto signupDto) {
-        accountService.register(signupDto,"ADMIN" );
-        return "success" ;
+        accountService.register(signupDto, ADMIN_ROLE);
+        return "success";
     }
 
+    @GetMapping("/staffs")
+    @ResponseStatus(HttpStatus.OK)
+    public List<StaffResponse> getAllStaffs() {
+        return accountService.getAllAccountByRole(ADMIN_ROLE);
+    }
+
+
+    @GetMapping("/customers")
+    @ResponseStatus(HttpStatus.OK)
+    public ListCustomerResponse getAllCustomers(
+            @RequestParam(
+                    value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
+                    int pageNo,
+            @RequestParam(
+                    value = "pageSize", defaultValue = "20", required = false)
+                    int pageSize) {
+        return customerService.getAllCustomers(pageNo, pageSize);
+    }
 //    private final UserService userService;
-//    private static final String ADMIN_ROLE = "ADMIN";
+
 //    private final RegistrationService registrationService;
 //
 //    public UserManagementController(UserService userService, RegistrationService registrationService) {
@@ -111,7 +137,6 @@ public class UserManagementController {
 //    public TokenResponse register(@Valid @RequestBody RegistrationRequest registrationRequest){
 //        return registrationService.register(registrationRequest, ADMIN_ROLE);
 //    }
-
 
 
 }

@@ -3,16 +3,20 @@ package com.nashtech.ecommercialwebsite.services.impl;
 import com.nashtech.ecommercialwebsite.data.entity.*;
 import com.nashtech.ecommercialwebsite.data.repository.*;
 import com.nashtech.ecommercialwebsite.dto.request.SignupDto;
+import com.nashtech.ecommercialwebsite.dto.response.StaffResponse;
 import com.nashtech.ecommercialwebsite.exceptions.InternalServerException;
 import com.nashtech.ecommercialwebsite.exceptions.ResourceConfictException;
 import com.nashtech.ecommercialwebsite.exceptions.ResourceNotFoundException;
 import com.nashtech.ecommercialwebsite.services.AccountServices;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +27,7 @@ public class AccountServicesImpl implements AccountServices {
     private final BCryptPasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final StaffRepo staffRepo;
+    private final ModelMapper mapper;
 
     @Override
     public void register(SignupDto registrationDto, String roleName) {
@@ -83,6 +88,16 @@ public class AccountServicesImpl implements AccountServices {
         }
 
 
+    }
+
+    @Override
+    public List<StaffResponse> getAllAccountByRole(String role) {
+//        List<Account> accounts = accountRepo.findAccountByRole_RoleNameAndIsEnabled(role, true).orElseThrow(
+//                () -> new ResourceNotFoundException("No result for role: " + role));
+//        return accounts.stream()
+//                .map(account -> mapper.map(account, StaffResponse.class))
+//                .collect(Collectors.toList());
+        return null;
     }
 
 }

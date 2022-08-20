@@ -103,6 +103,26 @@ public class ProductManagementController {
 //        return productService.deleteProduct(id);
 //    }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get product detail by ID", description = "Provides product information by single")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found - This product was not found",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server",
+                    content = {@Content(examples = {@ExampleObject()})})
+
+    })
+    public SingleProductResponse findProductById(@PathVariable("id") int id) {
+        return productService.getSingleProduct(id);
+    }
+
+
     @PostMapping("/gallery")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Upload image to cloudinary", description = "This provide the ability of upload image to Cloudinary and return the URL")

@@ -1,7 +1,7 @@
 package com.nashtech.ecommercialwebsite.config;
 
 
-import com.google.common.collect.Lists;
+
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -9,7 +9,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,9 +49,6 @@ public class OpenApiConfiguration {
                 )
                 .info(new Info().title(apiTitle).version(apiVersion))
 
-                .servers(Lists.newArrayList(
-                        new Server().url(serverUrl)
-                ))
                 .info(new Info()
                         .title("Ecommerce website")
                         .description("This document is specified by Pham Minh Quoc")

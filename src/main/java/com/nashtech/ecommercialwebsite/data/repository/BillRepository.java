@@ -17,10 +17,11 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
     Page<Bill> findBillByStatus(Pageable pageable, int status);
 
-    @Query(value = "select sum(price_total) from bills " +
+    @Query(value = "select sum(price_total) from phieu_dat " +
             "where status = 2  and create_date between ?1 and ?2", nativeQuery = true)
     Long getSaleByRangeOfDate(String dateStart, String dateEnd);
 
-    @Query(value = "select * from bills where status = 2  and create_date between ?1 and ?2", nativeQuery = true)
+    @Query(value = "select * from phieu_dat where status = 2  and create_date between ?1 and ?2", nativeQuery = true)
+//    @Query(value = "select b from Bill b where b.status = 2 and b.createDate between ?1 and ?2 order by b.createDate desc ")
     List<Bill> getBillsByDate(String dateStart, String dateEnd);
 }

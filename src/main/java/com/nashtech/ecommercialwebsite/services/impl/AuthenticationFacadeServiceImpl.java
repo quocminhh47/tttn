@@ -23,7 +23,7 @@ public class AuthenticationFacadeServiceImpl implements AuthenticationFacadeServ
     @Override
     public Account getAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getName());
+        if(authentication == null || authentication.getName().equals("anonymousUser")) return null;
         return accountRepo.findById(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("User %s not found", authentication.getName())));

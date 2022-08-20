@@ -14,20 +14,22 @@ public interface BillService {
     BillResponse getBillById( int billId);
 
     BillResponse getSingleBillDetail(int billId);
-//
-//    BillResponse changeBilStatus(int billId, String status) ;
-//
-//    List<BillDetailReponse> getBillByAccount();
-//
-//    BillPaginationResponse getAllBills(int pageNo,
-//                                       int pageSize,
-//                                       String sortBy,
-//                                       String sortDir);
-//
-//    BillPaginationResponse getAllBillsByStatus(int pageNo,
-//                                               int pageSize,
-//                                               String sortBy,
-//                                               String sortDir,
-//                                               String status);
-//    BillReportResponse getSaleReportByDateRange(String dateStart, String dateEnd);
+
+    BillResponse changeBilStatus(int billId, String status) ;
+
+    List<BillDetailReponse> getBillsByCustomer();
+
+    BillPaginationResponse getAllBills(int pageNo,
+                                       int pageSize,
+                                       String sortBy,
+                                       String sortDir);
+
+    BillPaginationResponse getAllBillsByStatus(int pageNo,
+                                               int pageSize,
+                                               String sortBy,
+                                               String sortDir,
+                                               String status);
+    BillReportResponse getSaleReportByDateRange(String dateStart, String dateEnd);
+
+    BillResponse setDeliveryStaff(int billId, String staffEmail);
 }

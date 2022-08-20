@@ -4,6 +4,7 @@ import com.nashtech.ecommercialwebsite.data.entity.*;
 import com.nashtech.ecommercialwebsite.data.repository.AccountRepo;
 import com.nashtech.ecommercialwebsite.data.repository.BillRepository;
 import com.nashtech.ecommercialwebsite.data.repository.ProductRepository;
+import com.nashtech.ecommercialwebsite.data.repository.StaffRepo;
 import com.nashtech.ecommercialwebsite.dto.request.BillRequest;
 import com.nashtech.ecommercialwebsite.dto.request.CartItemUpdateDto;
 import com.nashtech.ecommercialwebsite.dto.response.*;
@@ -22,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,6 +42,8 @@ public class BillServiceImpl implements BillService {
     private final AccountRepo accountRepo;
 
     private final AuthenticationFacadeService authenticationFacade;
+
+    private final StaffRepo staffRepo;
 
 
     @Override
@@ -67,7 +67,7 @@ public class BillServiceImpl implements BillService {
                         String.format("Product with ID: %s not found", item.getProductId()));
             }
             Product product = productMap.get(item.getProductId());
-            if(product.getQuantity() < item.getProductQuantity())
+            if (product.getQuantity() < item.getProductQuantity())
                 throw new OutOfStockException("Product quantity order is greater than its available: " + product.getQuantity());
             BillDetail billDetail = new BillDetail();
             billDetail.setId(new BillDetailId(bill.getId(), item.getProductId()));
@@ -113,7 +113,21 @@ public class BillServiceImpl implements BillService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Bill %s not found", billId)));
 
-        return convertBillToBillResponse(bill);
+        BillResponse billResponse = convertBillToBillResponse(bill);
+        Optional<Staff> approvedStaff = Optional.ofNullable(bill.getApprovedStaff());
+        if (approvedStaff.isEmpty()) {
+            billResponse.setApprovedStaff("Not approved yet !");
+        } else {
+            billResponse.setApprovedStaff(bill.getApprovedStaff().getFirstName() + " " + bill.getApprovedStaff().getLastName());
+        }
+
+        Optional<Staff> deliveryStaff = Optional.ofNullable(bill.getShipper());
+        if (deliveryStaff.isEmpty()) {
+            billResponse.setDeliveryStaff("Not assigned yet !");
+        } else {
+            billResponse.setApprovedStaff(bill.getApprovedStaff().getFirstName() + " " + bill.getApprovedStaff().getLastName());
+        }
+        return billResponse;
     }
 
     @Override
@@ -122,42 +136,58 @@ public class BillServiceImpl implements BillService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Bill %s not found", billId)));
 
-        return convertBillToBillResponse(bill);
+        BillResponse billResponse = convertBillToBillResponse(bill);
+        Optional<Staff> approvedStaff = Optional.ofNullable(bill.getApprovedStaff());
+        if (approvedStaff.isEmpty()) {
+            billResponse.setApprovedStaff("Not approved yet !");
+        } else {
+            billResponse.setApprovedStaff(bill.getApprovedStaff().getFirstName() + " " + bill.getApprovedStaff().getLastName());
+        }
+
+        Optional<Staff> deliveryStaff = Optional.ofNullable(bill.getShipper());
+        if (deliveryStaff.isEmpty()) {
+            billResponse.setDeliveryStaff("Not assigned yet !");
+        } else {
+            billResponse.setDeliveryStaff(deliveryStaff.get().getFirstName() + " " + deliveryStaff.get().getLastName());
+//            billResponse.setApprovedStaff(bill.getApprovedStaff().getFirstName() + " " + bill.getApprovedStaff().getLastName());
+        }
+
+        return billResponse;
 
     }
-//
-//    @Override
-//    public BillResponse changeBilStatus(int billId, String status) {
-//        int statusValueConverted = getBillStatus(status);
-//
-//        Bill bill = billRepository.findById(billId)
-//                .orElseThrow(() -> new ResourceNotFoundException(
-//                        String.format("Bill Id: %s not found", billId)
-//                ));
-//        bill.setStatus(statusValueConverted);
-//        Bill updatedBill = billRepository.save(bill);
-//
-//        return convertBillToBillResponse(updatedBill);
-//    }
 
-   /* @Override
-    public List<BillDetailReponse> getBillByAccount() {
+    @Override
+    public List<BillDetailReponse> getBillsByCustomer() {
         List<BillDetailReponse> billResponseList = new ArrayList<>();
 
-        String currentPrincipalName = authenticationFacade.getCurentUsername();
-        Staff user = userRepository.findAccountByUsername(currentPrincipalName)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Username %s not found", currentPrincipalName)));
+        Account account = authenticationFacade.getAccount();
 
-        List<Bill> bills = billRepository.findBillByAccount(user);
+        List<Bill> bills = billRepository.findByCustomer(account.getCustomer());
 
         bills.forEach(bill -> {
             BillDetailReponse billDetailReponse = mapper.map(bill, BillDetailReponse.class);
-            billDetailReponse.setUsername(user.getUsername());
+            billDetailReponse.setUsername(account.getEmail());
             billResponseList.add(billDetailReponse);
-
         });
         return billResponseList;
+    }
+
+    @Override
+    public BillResponse changeBilStatus(int billId, String status) {
+        int statusValueConverted = getBillStatus(status);
+
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Bill Id: %s not found", billId)));
+        bill.setStatus(statusValueConverted);
+
+        Account currentAccount = authenticationFacade.getAccount();
+        bill.setApprovedStaff(currentAccount.getStaff());
+        Bill updatedBill = billRepository.save(bill);
+
+        BillResponse billResponse = convertBillToBillResponse(updatedBill);
+        billResponse.setApprovedStaff(bill.getApprovedStaff().getFirstName() + " " + bill.getApprovedStaff().getLastName());
+        return billResponse;
     }
 
     @Override
@@ -208,17 +238,36 @@ public class BillServiceImpl implements BillService {
         List<BillDetailReponse> billResponseList = new ArrayList<>();
         billRepository.getBillsByDate(dateStart, dateEnd).forEach(bill -> {
             BillDetailReponse billDetailReponse = mapper.map(bill, BillDetailReponse.class);
-            billDetailReponse.setUsername(bill.getStaff().getUsername());
+            billDetailReponse.setUsername(bill.getCustomer().getAccount().getEmail());
             billResponseList.add(billDetailReponse);
         });
 
         return new BillReportResponse(sale, billResponseList);
     }
 
+    @Override
+    public BillResponse setDeliveryStaff(int billId, String staffEmail) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Bill Id: %s not found", billId)));
+       Account account = accountRepo.findAccountByEmail(staffEmail).orElseThrow(
+               () -> new ResourceNotFoundException("Staff :" + staffEmail + "not found"));
+       if(account.getRole().getRoleName().equalsIgnoreCase("user"))
+           throw new BadRequestException("Only staff be assigned for this");
+       Staff staff =account.getStaff();
 
+        bill.setShipper(staff);
 
-
-
+        Optional<Staff> approvedStaff = Optional.ofNullable(bill.getApprovedStaff());
+        if (approvedStaff.isEmpty() || bill.getStatus() == 0) {
+            throw new BadRequestException("This order must be approved before assigned to be deliveried");
+        }
+        Bill savedBill = billRepository.save(bill);
+        BillResponse response = convertBillToBillResponse(savedBill);
+        response.setApprovedStaff(savedBill.getApprovedStaff().getFirstName() + " " + savedBill.getApprovedStaff().getLastName());
+        response.setDeliveryStaff(savedBill.getShipper().getFirstName() + " " + savedBill.getShipper().getLastName());
+        return response;
+    }
 
     private int getBillStatus(String status) {
         int statusValueConverted = 0;
@@ -240,14 +289,12 @@ public class BillServiceImpl implements BillService {
         return statusValueConverted;
     }
 
-
-    }*/
-   private BillItemResponse mapToBillItemResponse(CartItemUpdateDto cartItemUpdateDto, Product product) {
-       BillItemResponse billItemResponse = mapper.map(cartItemUpdateDto, BillItemResponse.class);
-       billItemResponse.setProductName(product.getName());
-       billItemResponse.setProductPrice(product.getPrice());
-       return billItemResponse;
-   }
+    private BillItemResponse mapToBillItemResponse(CartItemUpdateDto cartItemUpdateDto, Product product) {
+        BillItemResponse billItemResponse = mapper.map(cartItemUpdateDto, BillItemResponse.class);
+        billItemResponse.setProductName(product.getName());
+        billItemResponse.setProductPrice(product.getPrice());
+        return billItemResponse;
+    }
 
     private BillPaginationResponse getContent(Page<Bill> bills) {
         List<Bill> billList = bills.getContent();

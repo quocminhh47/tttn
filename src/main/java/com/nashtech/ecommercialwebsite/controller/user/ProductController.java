@@ -51,14 +51,14 @@ public class ProductController {
                     value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
                     int pageSize,
             @RequestParam(
-                    value = "sortBy", defaultValue = "price", required = false)
-                    String sortBy,
+                    value = "brand", defaultValue = "", required = true)
+                    String branch,
             @RequestParam(
-                    value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
-                    String sortDir
+                    value = "text", defaultValue = "", required = false)
+                    String text
     ) {
 
-        return productService.getHomeProducts(pageNo, pageSize, sortBy, sortDir);
+        return productService.getProductsByCondition(pageNo, pageSize, text, branch);
     }
 
 

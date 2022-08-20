@@ -35,7 +35,13 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public RatingResponse getUserRatingByProduct(int productId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null) {
+            log.info("anynomous user");
+            return null;
+        }
         Account account = authenticationFacadeService.getAccount();
+        if(account == null) return null;
         Integer customerId = account.getCustomer().getId();
         return new RatingResponse(
                ratingRepository.getRatingPointsFromProduct(productId),

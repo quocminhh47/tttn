@@ -30,4 +30,8 @@ public class BillResponse {
     private String address;
 
     private String email;
+
+    private String approvedStaff;
+
+    private String deliveryStaff;
 }

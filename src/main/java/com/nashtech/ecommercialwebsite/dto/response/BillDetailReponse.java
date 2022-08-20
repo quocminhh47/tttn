@@ -2,7 +2,6 @@ package com.nashtech.ecommercialwebsite.dto.response;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @ToString
@@ -13,13 +12,13 @@ import java.util.Date;
 @AllArgsConstructor
 public class BillDetailReponse {
 
-    private  String username;
+    private String username;
 
-    private int billId;
+    private int id;
 
-    private  int status;
+    private int status;
 
     private Date createDate;
 
-    private  int priceTotal;
+    private int priceTotal;
 }

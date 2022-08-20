@@ -62,25 +62,25 @@ public class BillController {
     public BillResponse getBillDetailById(@PathVariable("id") int id) {
         return billService.getBillById(id);
     }
-//
-//    @GetMapping("/bill/all")
-//    @Operation(summary = "Get bill history of customer", description = "Provide all bill history which were ordered by account")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "OK - Successfully retrieve"),
-//            @ApiResponse(responseCode = "400",
-//                    description = "Bad Request - The request is invalid",
-//                    content = {@Content(examples = {@ExampleObject()})}),
-//            @ApiResponse(responseCode = "404",
-//                    description = "Not found - The create bill url was not found"),
-//            @ApiResponse(responseCode = "403",
-//                    description = "Forbidden - The request is not permitted"),
-//            @ApiResponse(responseCode = "500",
-//                    description = "Internal Error - There were some error while processing in server")
-//    })
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<BillDetailReponse> getBillDetailByAccount() {
-//        return billService.getBillByAccount();
-//    }
+
+    @GetMapping("/bill/all")
+    @Operation(summary = "Get bill history of customer", description = "Provide all bill history which were ordered by account")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully retrieve"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found - The create bill url was not found"),
+            @ApiResponse(responseCode = "403",
+                    description = "Forbidden - The request is not permitted"),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server")
+    })
+    @ResponseStatus(HttpStatus.OK)
+    public List<BillDetailReponse> getBillDetailByAccount() {
+        return billService.getBillsByCustomer();
+    }
 
 
 

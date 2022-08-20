@@ -1,8 +1,14 @@
 package com.nashtech.ecommercialwebsite.services.impl;
 
 
-import com.nashtech.ecommercialwebsite.data.entity.*;
-import com.nashtech.ecommercialwebsite.data.repository.*;
+import com.nashtech.ecommercialwebsite.data.entity.Brand;
+import com.nashtech.ecommercialwebsite.data.entity.Category;
+import com.nashtech.ecommercialwebsite.data.entity.Product;
+import com.nashtech.ecommercialwebsite.data.entity.Provider;
+import com.nashtech.ecommercialwebsite.data.repository.BrandRepository;
+import com.nashtech.ecommercialwebsite.data.repository.CategoryRepo;
+import com.nashtech.ecommercialwebsite.data.repository.ProductRepository;
+import com.nashtech.ecommercialwebsite.data.repository.ProviderRepo;
 import com.nashtech.ecommercialwebsite.dto.request.ProductRequest;
 import com.nashtech.ecommercialwebsite.dto.response.*;
 import com.nashtech.ecommercialwebsite.exceptions.ResourceNotFoundException;
@@ -33,24 +39,31 @@ public class ProductServiceImpl implements ProductService {
     private final ProviderRepo providerRepo;
     private final RatingService ratingService;
 
-    @Override
-    public ListProductHome getHomeProducts(int pageNo, int pageSize, String sortBy, String sortDirection) {
-        Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Product> productPage = productRepository.findProductByHidden(false, pageable);
-        return productMapper.getContent(productPage);
-    }
+//    @Override
+//    public ListProductHome getHomeProducts(int pageNo, int pageSize, String sortBy, String sortDirection) {
+//        Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+//                : Sort.by(sortBy).descending();
+//        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+//        Page<Product> productPage = productRepository.findProductByHidden(false, pageable);
+//        return productMapper.getContent(productPage);
+//    }
 
     @Override
     public SingleProductResponse findProductById(int id) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Product."+ id + ".not.found"));
+                () -> new ResourceNotFoundException("Product." + id + ".not.found"));
         RatingResponse ratingResponse = ratingService.getUserRatingByProduct(id);
         SingleProductResponse response = mapper.map(product, SingleProductResponse.class);
         response.setRatingResponse(ratingResponse);
 
         return response;
+    }
+
+    @Override
+    public SingleProductResponse getSingleProduct(int id) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Product." + id + ".not.found"));
+        return mapper.map(product, SingleProductResponse.class);
     }
 
     @Override
@@ -66,19 +79,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-
     @Override
     public SingleProductResponse saveProduct(ProductRequest productRequest, Integer id) {
 
         Category category = categoryRepo.findById(productRequest.getCategoryId()).orElseThrow(
-                () -> new ResourceNotFoundException("Category with ID: " + productRequest.getCategoryId() +" not exist"));
+                () -> new ResourceNotFoundException("Category with ID: " + productRequest.getCategoryId() + " not exist"));
         Provider provider = providerRepo.findById(productRequest.getProviderId()).orElseThrow(
-                () -> new ResourceNotFoundException("Provider with ID: "+ productRequest.getProviderId()+" not exist"));
+                () -> new ResourceNotFoundException("Provider with ID: " + productRequest.getProviderId() + " not exist"));
         Brand brand = brandRepository.findById(productRequest.getBrandId()).orElseThrow(
-                () -> new ResourceNotFoundException("Brand with ID: " + productRequest.getBrandId() +" not exist"));
+                () -> new ResourceNotFoundException("Brand with ID: " + productRequest.getBrandId() + " not exist"));
 
-        if(id == null) {
-            Product product =  Product.builder()
+        if (id == null) {
+            Product product = Product.builder()
                     .name(productRequest.getName())
                     .price(productRequest.getPrice())
                     .quantity(productRequest.getQuantity())
@@ -98,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
             productRepository.findById(id).orElseThrow(
                     () -> new ResourceNotFoundException("Product id: " + id + " not found"));
 
-            Product product =  Product.builder()
+            Product product = Product.builder()
                     .id(id)
                     .name(productRequest.getName())
                     .price(productRequest.getPrice())
@@ -119,7 +131,17 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-//    //convert product entity to ProductDto
+    @Override
+    public ListProductHome getProductsByCondition(int pageNo, int pageSize, String text, String brand) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Product> productPage = productRepository.getProductByCondition(
+                text.toLowerCase(),
+                brand.trim().toLowerCase(),
+                pageable);
+        return productMapper.getContent(productPage);
+    }
+
+    //    //convert product entity to ProductDto
     private ProductDto maptoDTO(Product product) {
         return mapper.map(product, ProductDto.class);
     }
